@@ -14,6 +14,13 @@ router.post(
 router.post(
   '/login',
   validate(usersSchema.login),
+  UsersController.login,
+);
+
+router.get(
+  '/list',
+  validate(usersSchema.list, 'query'),
+  UsersController.list,
 );
 
 export default router;
