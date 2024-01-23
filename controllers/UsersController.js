@@ -1,5 +1,6 @@
 import HttpError from 'http-errors';
 import JWT from 'jsonwebtoken';
+import { Op } from 'sequelize';
 import sequelize from '../services/sequelize.js';
 import { Users } from '../models/index.js';
 
@@ -73,6 +74,39 @@ class UsersController {
       });
     } catch (e) {
       await t.rollback();
+      next(e);
+    }
+  }
+
+  static async list(req, res, next) {
+    try {
+      const { s, limit = 20, page = 1 } = req.query;
+
+      const where = {};
+
+      if (s) {
+        where[Op.or] = [
+          { firstName: { [Op.substring]: s } },
+          { lastName: { [Op.substring]: s } },
+          { email: { [Op.substring]: s } },
+        ];
+      }
+      const users = await Users.findAll({
+        where,
+        limit,
+        offset: (page - 1) * limit,
+      });
+
+      const total = await Users.count();
+      const totalPages = Math.ceil(total / limit);
+
+      res.send({
+        status: 'ok',
+        users,
+        total,
+        totalPages,
+      });
+    } catch (e) {
       next(e);
     }
   }
