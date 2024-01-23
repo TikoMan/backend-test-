@@ -7,4 +7,8 @@ export default {
     email: Joi.string().trim().email().required(),
     password: Joi.string().required(),
   }),
+  login: Joi.object({
+    email: Joi.string().trim().email().required(),
+    password: Joi.string().required(),
+  }),
 };
