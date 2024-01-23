@@ -30,11 +30,13 @@ class BlogsController {
   static async update(req, res, next) {
     const t = await sequelize.transaction();
     try {
+      const { userId } = req;
       const { blogId, title, body } = req.body;
 
       const blog = await Blogs.findOne({
         where: {
           id: blogId,
+          authorId: userId,
         },
       });
 
