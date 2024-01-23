@@ -17,10 +17,20 @@ router.post(
   UsersController.login,
 );
 
+router.put(
+  '/update',
+  validate(usersSchema.update),
+  UsersController.update,
+);
+
 router.get(
   '/list',
   validate(usersSchema.list, 'query'),
   UsersController.list,
 );
 
+router.get(
+  '/single/:id',
+  UsersController.profile,
+);
 export default router;
