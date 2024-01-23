@@ -17,4 +17,9 @@ router.put(
   BlogsController.update,
 );
 
+router.delete(
+  '/:blogId',
+  BlogsController.delete,
+);
+
 export default router;
