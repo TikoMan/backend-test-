@@ -25,14 +25,14 @@ Comments.init({
 });
 
 Comments.belongsTo(Users, {
-  foreignKey: 'userId',
-  as: 'user',
+  foreignKey: 'authorId',
+  as: 'author',
   onUpdate: 'cascade',
   onDelete: 'cascade',
 });
 
 Users.hasMany(Comments, {
-  foreignKey: 'userId',
+  foreignKey: 'authorId',
   as: 'comments',
   onUpdate: 'cascade',
   onDelete: 'cascade',
