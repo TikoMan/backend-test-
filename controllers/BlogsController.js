@@ -1,3 +1,4 @@
+import HttpError from 'http-errors';
 import sequelize from '../services/sequelize.js';
 import { Blogs } from '../models/index.js';
 
@@ -18,6 +19,38 @@ class BlogsController {
 
       res.send({
         statusL: 'ok',
+        blog,
+      });
+    } catch (e) {
+      await t.rollback();
+      next(e);
+    }
+  }
+
+  static async update(req, res, next) {
+    const t = await sequelize.transaction();
+    try {
+      const { blogId, title, body } = req.body;
+
+      const blog = await Blogs.findOne({
+        where: {
+          id: blogId,
+        },
+      });
+
+      if (!blog) {
+        throw HttpError(404, 'blog not found');
+      }
+
+      await blog.update({
+        title,
+        body,
+      });
+
+      await t.commit();
+
+      res.send({
+        status: 'ok',
         blog,
       });
     } catch (e) {
