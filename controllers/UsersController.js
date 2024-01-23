@@ -1,6 +1,9 @@
 import HttpError from 'http-errors';
+import JWT from 'jsonwebtoken';
 import sequelize from '../services/sequelize.js';
 import { Users } from '../models/index.js';
+
+const { JWT_SECRET } = process.env;
 
 class UsersController {
   static async register(req, res, next) {
@@ -36,6 +39,37 @@ class UsersController {
       res.send({
         status: 'ok',
         user,
+      });
+    } catch (e) {
+      await t.rollback();
+      next(e);
+    }
+  }
+
+  static async login(req, res, next) {
+    const t = await sequelize.transaction();
+    try {
+      const { email, password } = req.body;
+
+      const user = await Users.findOne({
+        where: {
+          email,
+          password: Users.passwordHash(password),
+        },
+      });
+
+      if (!user) {
+        throw HttpError(401, 'Invalid email or password');
+      }
+
+      const token = JWT.sign({ userId: user.id }, JWT_SECRET);
+
+      await t.commit();
+
+      res.send({
+        status: 'ok',
+        user,
+        token,
       });
     } catch (e) {
       await t.rollback();
