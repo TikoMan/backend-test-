@@ -1,6 +1,6 @@
 import HttpError from 'http-errors';
 import sequelize from '../services/sequelize.js';
-import { Blogs } from '../models/index.js';
+import { Blogs, Comments } from '../models/index.js';
 
 class BlogsController {
   static async create(req, res, next) {
@@ -87,6 +87,33 @@ class BlogsController {
       });
     } catch (e) {
       await t.rollback();
+      next(e);
+    }
+  }
+
+  static async list(req, res, next) {
+    try {
+      const { limit = 20, page = 1 } = req.query;
+
+      const blogs = await Blogs.findAll({
+        limit,
+        offset: (page - 1) * limit,
+        // include: {
+        //   model: Comments,
+        //   as: 'comments',
+        // },
+      });
+
+      const total = await Blogs.count();
+      const totalPages = Math.ceil(total / limit);
+
+      res.send({
+        status: 'ok',
+        blogs,
+        total,
+        totalPages,
+      });
+    } catch (e) {
       next(e);
     }
   }
