@@ -7,6 +7,12 @@ class Blogs extends Model {
 }
 
 Blogs.init({
+  id: {
+    type: DataTypes.BIGINT.UNSIGNED,
+    allowNull: false,
+    autoIncrement: true,
+    primaryKey: true,
+  },
   title: {
     type: DataTypes.STRING,
     allowNull: false,
