@@ -121,6 +121,28 @@ class UsersController {
     }
   }
 
+  static async delete(req, res, next) {
+    const t = await sequelize.transaction();
+    try {
+      const { userId } = req;
+
+      await Users.destroy({
+        where: {
+          id: userId,
+        },
+      });
+
+      await t.commit();
+
+      res.send({
+        status: 'ok',
+      });
+    } catch (e) {
+      await t.rollback();
+      next(e);
+    }
+  }
+
   static async list(req, res, next) {
     try {
       const { s, limit = 20, page = 1 } = req.query;
