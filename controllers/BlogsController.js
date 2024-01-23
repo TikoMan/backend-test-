@@ -64,11 +64,13 @@ class BlogsController {
   static async delete(req, res, next) {
     const t = await sequelize.transaction();
     try {
+      const { userId } = req;
       const { blogId } = req.params;
 
       const blog = await Blogs.findOne({
         where: {
           id: blogId,
+          authorId: userId,
         },
       });
 
