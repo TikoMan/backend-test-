@@ -78,6 +78,49 @@ class UsersController {
     }
   }
 
+  static async update(req, res, next) {
+    const t = await sequelize.transaction();
+    try {
+      const { userId } = req;
+      const {
+        firstName, lastName, email, password,
+      } = req.body;
+
+      const exists = await Users.findOne({
+        where: {
+          email,
+        },
+      });
+
+      if (exists) {
+        throw HttpError(422, {
+          errors: {
+            email: 'Already registered',
+          },
+        });
+      }
+
+      const user = await Users.findByPk(userId);
+
+      await user.update({
+        firstName,
+        lastName,
+        email,
+        password,
+      });
+
+      await t.commit();
+
+      res.send({
+        status: 'ok',
+        user,
+      });
+    } catch (e) {
+      await t.rollback();
+      next(e);
+    }
+  }
+
   static async list(req, res, next) {
     try {
       const { s, limit = 20, page = 1 } = req.query;
@@ -105,6 +148,25 @@ class UsersController {
         users,
         total,
         totalPages,
+      });
+    } catch (e) {
+      next(e);
+    }
+  }
+
+  static async profile(req, res, next) {
+    try {
+      const { id } = req.params;
+
+      const user = await Users.findByPk(id);
+
+      if (!user) {
+        throw HttpError(404, 'User not found');
+      }
+
+      res.send({
+        status: 'ok',
+        user,
       });
     } catch (e) {
       next(e);
