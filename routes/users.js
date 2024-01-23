@@ -23,6 +23,11 @@ router.put(
   UsersController.update,
 );
 
+router.delete(
+  '/delete',
+  UsersController.delete,
+);
+
 router.get(
   '/list',
   validate(usersSchema.list, 'query'),
