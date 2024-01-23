@@ -58,6 +58,34 @@ class BlogsController {
       next(e);
     }
   }
+
+  static async delete(req, res, next) {
+    const t = await sequelize.transaction();
+    try {
+      const { blogId } = req.params;
+
+      const blog = await Blogs.findOne({
+        where: {
+          id: blogId,
+        },
+      });
+
+      if (!blog) {
+        throw HttpError(404, 'blog not found');
+      }
+
+      await blog.destroy();
+
+      await t.commit();
+
+      res.send({
+        status: 'ok',
+      });
+    } catch (e) {
+      await t.rollback();
+      next(e);
+    }
+  }
 }
 
 export default BlogsController;
