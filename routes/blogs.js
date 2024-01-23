@@ -11,4 +11,10 @@ router.post(
   BlogsController.create,
 );
 
+router.put(
+  '/update',
+  validate(blogsSchema.update),
+  BlogsController.update,
+);
+
 export default router;
