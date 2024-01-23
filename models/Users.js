@@ -35,7 +35,7 @@ Users.init({
     allowNull: false,
     set(val) {
       if (val) {
-        this.setDataValue('password', this.passwordHash(val));
+        this.setDataValue('password', Users.passwordHash(val));
       }
     },
 
