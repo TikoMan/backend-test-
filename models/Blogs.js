@@ -28,12 +28,12 @@ Blogs.init({
 });
 
 Blogs.belongsTo(Users, {
-  foreignKey: 'userId',
-  as: 'user',
+  foreignKey: 'authorId',
+  as: 'author',
 });
 
 Users.hasMany(Blogs, {
-  foreignKey: 'userId',
+  foreignKey: 'authorId',
   as: 'blogs',
   onUpdate: 'cascade',
   onDelete: 'cascade',
