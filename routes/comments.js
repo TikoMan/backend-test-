@@ -11,4 +11,10 @@ router.post(
   CommentsController.create,
 );
 
+router.put(
+  '/update',
+  validate(commentsSchema.update),
+  CommentsController.update,
+);
+
 export default router;
