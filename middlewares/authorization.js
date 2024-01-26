@@ -4,10 +4,14 @@ import HttpError from 'http-errors';
 const { JWT_SECRET } = process.env;
 
 const EXCLUDE = [
+  // USERS
   'POST:/users/login',
   'POST:/users/register',
   'GET:/users/list',
   'GET:/users/single/:id',
+  // BLOGS
+  'GET:/blogs',
+  'GET:/blogs/single/:id',
 ];
 
 export default function authorization(req, res, next) {
