@@ -23,9 +23,9 @@ router.delete(
 );
 
 router.get(
-  '/list',
+  '/',
   validate(blogsSchema.list, 'query'),
-  BlogsController.list,
+  BlogsController.index,
 );
 
 export default router;
