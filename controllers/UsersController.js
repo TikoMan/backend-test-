@@ -91,7 +91,7 @@ class UsersController {
         },
       });
 
-      if (exists) {
+      if (exists && exists.id !== userId) {
         throw HttpError(422, {
           errors: {
             email: 'Already registered',
@@ -123,7 +123,12 @@ class UsersController {
   static async delete(req, res, next) {
     const t = await sequelize.transaction();
     try {
+      const { id } = req.params;
       const { userId } = req;
+
+      if (+id !== +userId) {
+        throw HttpError(404, 'user not found');
+      }
 
       await Users.destroy({
         where: {
