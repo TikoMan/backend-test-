@@ -24,8 +24,14 @@ router.delete(
 
 router.get(
   '/',
-  validate(blogsSchema.list, 'query'),
+  validate(blogsSchema.index, 'query'),
   BlogsController.index,
+);
+
+router.get(
+  '/single/:id',
+  validate(blogsSchema.show, 'query'),
+  BlogsController.show,
 );
 
 export default router;
