@@ -1,6 +1,6 @@
 import HttpError from 'http-errors';
 import sequelize from '../services/sequelize.js';
-import { Blogs, Comments } from '../models/index.js';
+import { Blogs } from '../models/index.js';
 
 class BlogsController {
   static async create(req, res, next) {
