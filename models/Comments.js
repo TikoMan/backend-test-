@@ -39,14 +39,14 @@ Users.hasMany(Comments, {
 });
 
 Comments.belongsTo(Blogs, {
-  foreignKey: 'commentId',
+  foreignKey: 'blogId',
   as: 'blog',
   onUpdate: 'cascade',
   onDelete: 'cascade',
 });
 
 Blogs.hasMany(Comments, {
-  foreignKey: 'commentId',
+  foreignKey: 'blogId',
   as: 'comments',
   onUpdate: 'cascade',
   onDelete: 'cascade',
