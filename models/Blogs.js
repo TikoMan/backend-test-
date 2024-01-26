@@ -30,6 +30,8 @@ Blogs.init({
 Blogs.belongsTo(Users, {
   foreignKey: 'authorId',
   as: 'author',
+  onUpdate: 'cascade',
+  onDelete: 'cascade',
 });
 
 Users.hasMany(Blogs, {
