@@ -8,15 +8,18 @@ const EXCLUDE = [
   'POST:/users/login',
   'POST:/users/register',
   'GET:/users/list',
-  'GET:/users/single/:id',
   // BLOGS
   'GET:/blogs',
-  'GET:/blogs/single/:id',
 ];
 
 export default function authorization(req, res, next) {
   try {
-    if (EXCLUDE.includes(`${req.method}:${req.path}`) || req.method === 'OPTIONS') {
+    if (
+      EXCLUDE.includes(`${req.method}:${req.path}`)
+        || `${req.method}:${req.path}`.match(/^GET:\/users\/single\/\d+$/)
+        || `${req.method}:${req.path}`.match(/^GET:\/blogs\/single\/\d+$/)
+        || req.method === 'OPTIONS'
+    ) {
       next();
       return;
     }
