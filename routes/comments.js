@@ -17,4 +17,9 @@ router.put(
   CommentsController.update,
 );
 
+router.delete(
+  '/:id',
+  CommentsController.delete,
+);
+
 export default router;
