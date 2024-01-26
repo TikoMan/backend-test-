@@ -24,7 +24,7 @@ router.put(
 );
 
 router.delete(
-  '/delete',
+  '/delete/:id',
   UsersController.delete,
 );
 
