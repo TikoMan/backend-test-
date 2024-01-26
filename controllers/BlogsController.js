@@ -116,10 +116,10 @@ class BlogsController {
 
   static async show(req, res, next) {
     try {
-      const { blogId } = req.params;
+      const { id } = req.params;
       const { limit = 20, page = 1 } = req.query;
 
-      const blog = await Blogs.findByPk(blogId, {
+      const blog = await Blogs.findByPk(id, {
         include: {
           model: Comments,
           as: 'comments',
@@ -134,7 +134,7 @@ class BlogsController {
 
       const totalComments = await Comments.count({
         where: {
-          blogId,
+          id,
         },
       });
       const totalCommentsPages = Math.ceil(totalComments / limit);
