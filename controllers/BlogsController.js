@@ -18,7 +18,7 @@ class BlogsController {
       await t.commit();
 
       res.send({
-        statusL: 'ok',
+        status: 'ok',
         blog,
       });
     } catch (e) {
