@@ -59,6 +59,30 @@ class CommentsController {
       next(e);
     }
   }
+
+  static async delete(req, res, next) {
+    const t = await sequelize.transaction();
+    try {
+      const { id } = req.params;
+
+      const comment = await Comments.findByPk(id);
+
+      if (!comment) {
+        throw HttpError(404, 'comment is not found');
+      }
+
+      await comment.destroy();
+
+      await t.commit();
+
+      res.send({
+        status: 'ok',
+      });
+    } catch (e) {
+      await t.rollback();
+      next(e);
+    }
+  }
 }
 
 export default CommentsController;
