@@ -91,17 +91,13 @@ class BlogsController {
     }
   }
 
-  static async list(req, res, next) {
+  static async index(req, res, next) {
     try {
       const { limit = 20, page = 1 } = req.query;
 
       const blogs = await Blogs.findAll({
         limit,
         offset: (page - 1) * limit,
-        // include: {
-        //   model: Comments,
-        //   as: 'comments',
-        // },
       });
 
       const total = await Blogs.count();
