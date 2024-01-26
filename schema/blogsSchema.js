@@ -12,7 +12,7 @@ export default {
     body: Joi.string().required(),
   }),
 
-  list: Joi.object({
+  index: Joi.object({
     page: Joi.number().min(1),
     limit: Joi.number().min(1).max(100),
   }),
