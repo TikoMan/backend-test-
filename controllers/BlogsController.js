@@ -1,6 +1,6 @@
 import HttpError from 'http-errors';
 import sequelize from '../services/sequelize.js';
-import { Blogs } from '../models/index.js';
+import { Blogs, Comments } from '../models/index.js';
 
 class BlogsController {
   static async create(req, res, next) {
@@ -108,6 +108,42 @@ class BlogsController {
         blogs,
         total,
         totalPages,
+      });
+    } catch (e) {
+      next(e);
+    }
+  }
+
+  static async show(req, res, next) {
+    try {
+      const { blogId } = req.params;
+      const { limit = 20, page = 1 } = req.query;
+
+      const blog = await Blogs.findByPk(blogId, {
+        include: {
+          model: Comments,
+          as: 'comments',
+          limit,
+          offset: (page - 1) * limit,
+        },
+      });
+
+      if (!blog) {
+        throw HttpError(404, 'blog not found');
+      }
+
+      const totalComments = await Comments.count({
+        where: {
+          blogId,
+        },
+      });
+      const totalCommentsPages = Math.ceil(totalComments / limit);
+
+      res.send({
+        status: 'ok',
+        blog,
+        totalComments,
+        totalCommentsPages,
       });
     } catch (e) {
       next(e);
