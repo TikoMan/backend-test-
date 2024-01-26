@@ -29,12 +29,6 @@ router.delete(
 );
 
 router.get(
-  '/list',
-  validate(usersSchema.list, 'query'),
-  UsersController.list,
-);
-
-router.get(
   '/single/:id',
   UsersController.profile,
 );
