@@ -54,15 +54,17 @@ userSchema.pre('findOneAndUpdate', async function hash(next) {
 
 userSchema.pre('deleteOne', async function delCascade(next) {
   try {
-    const { _conditions: { _id: id } } = this;
+    const { _conditions: { _id: authorId } } = this;
 
-    const blogs = await Blogs.find({ author: id });
+    const blogs = await Blogs.find({ author: authorId });
 
     await Promise.map(blogs, async (blog) => {
       await Comments.deleteMany({ blogId: blog.id });
     });
 
-    await Blogs.deleteMany({ author: id });
+    await Blogs.deleteMany({ author: authorId });
+
+    await Comments.deleteMany({ author: authorId });
     next();
   } catch (error) {
     next(error);
