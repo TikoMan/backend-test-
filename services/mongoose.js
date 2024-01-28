@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 
 const { MONGODB_HOST, MONGODB_PORT, MONGODB_DATABASE } = process.env;
 
-await mongoose.connect(`${MONGODB_HOST}:${MONGODB_PORT}/${MONGODB_DATABASE}`).then(() => {
+await mongoose.connect(`mongodb://${MONGODB_HOST}:${MONGODB_PORT}/${MONGODB_DATABASE}`).then(() => {
   /* eslint-disable no-console */
   console.log('Connected Mongoose');
 }).catch((e) => {
