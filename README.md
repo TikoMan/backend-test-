@@ -1,6 +1,6 @@
 # Basic Blog Platform
 
-A simple blog platform with user authentication, blog post CRUD operations, and commenting features. This project is built using Node.js and Sequelize with MySQL.
+A simple blog platform with user authentication, blog post CRUD operations, and commenting features. This project is built using Node.js,Express and Mongoose with MongoDB.
 
 ## Setup Instructions
 
@@ -27,11 +27,11 @@ A simple blog platform with user authentication, blog post CRUD operations, and 
     NODE_HOST=localhost
     NODE_PORT=4000
 
-    MYSQL_HOST=
-    MYSQL_PORT=
-    MYSQL_DATABASE=
-    MYSQL_USER=
-    MYSQL_PASSWORD=
+    MONGODB_HOST=
+    MONGODB_PORT=
+    MONGODB_DATABASE=
+    MONGODB_USER=
+    MONGODB_PASSWORD=
 
     JWT_SECRET=
     PASSWORD_SECRET=
@@ -39,16 +39,10 @@ A simple blog platform with user authentication, blog post CRUD operations, and 
 
 4. **Set up the database:**
 
-    - Make sure you have MySQL installed and running.
+    - Make sure you have MongoDB installed and running.
     - Configure the connection details in the `.env` file.
 
-5. **Run migrations:**
-
-    ```bash
-    yarn migrate
-    ```
-
-6. **Start the server:**
+5. **Start the server and Mongoose connect:**
 
     ```bash
     yarn start
@@ -62,14 +56,15 @@ Detailed API documentation can be found in the [API_DOCUMENTATION.md](./API_DOCU
 
 - Node.js
 - Express.js
-- Sequelize
-- MySQL
+- Mongoose
+- MongoDb
 - dotenv
 - http-errors
 - jsonwebtoken
 - lodash
 - md5
 - morgan
+- bluebird
 
 ## ESLint
 
