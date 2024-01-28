@@ -1,55 +1,22 @@
-import { DataTypes, Model } from 'sequelize';
-import sequelize from '../services/sequelize.js';
-import Blogs from './Blogs.js';
-import Users from './Users.js';
+import mongoose from '../services/mongoose.js';
 
-class Comments extends Model {
-
-}
-
-Comments.init({
-  id: {
-    type: DataTypes.BIGINT.UNSIGNED,
-    allowNull: false,
-    autoIncrement: true,
-    primaryKey: true,
+const commentsSchema = new mongoose.Schema({
+  text: { type: String, required: true },
+  authorId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Users',
+    required: true,
   },
-  text: {
-    type: DataTypes.TEXT('long'),
-    allowNull: false,
+  blogId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Blogs',
+    required: true,
   },
 }, {
-  modelName: 'comments',
-  tableName: 'comments',
-  sequelize,
+  versionKey: false,
+  timestamps: true,
 });
 
-Comments.belongsTo(Users, {
-  foreignKey: 'authorId',
-  as: 'author',
-  onUpdate: 'cascade',
-  onDelete: 'cascade',
-});
-
-Users.hasMany(Comments, {
-  foreignKey: 'authorId',
-  as: 'comments',
-  onUpdate: 'cascade',
-  onDelete: 'cascade',
-});
-
-Comments.belongsTo(Blogs, {
-  foreignKey: 'blogId',
-  as: 'blog',
-  onUpdate: 'cascade',
-  onDelete: 'cascade',
-});
-
-Blogs.hasMany(Comments, {
-  foreignKey: 'blogId',
-  as: 'comments',
-  onUpdate: 'cascade',
-  onDelete: 'cascade',
-});
+const Comments = mongoose.model('Comments', commentsSchema);
 
 export default Comments;

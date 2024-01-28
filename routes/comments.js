@@ -6,7 +6,7 @@ import CommentsController from '../controllers/CommentsController.js';
 const router = Router();
 
 router.post(
-  '/',
+  '/create',
   validate(commentsSchema.create),
   CommentsController.create,
 );
@@ -18,7 +18,7 @@ router.put(
 );
 
 router.delete(
-  '/:id',
+  '/delete/:id',
   CommentsController.delete,
 );
 

@@ -16,8 +16,8 @@ export default function authorization(req, res, next) {
   try {
     if (
       EXCLUDE.includes(`${req.method}:${req.path}`)
-        || `${req.method}:${req.path}`.match(/^GET:\/users\/single\/\d+$/)
-        || `${req.method}:${req.path}`.match(/^GET:\/blogs\/single\/\d+$/)
+        || `${req.method}:${req.path}`.match(/^GET:\/users\/single\/\w+$/)
+        || `${req.method}:${req.path}`.match(/^GET:\/blogs\/single\/\w+$/)
         || req.method === 'OPTIONS'
     ) {
       next();

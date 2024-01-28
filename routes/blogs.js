@@ -6,7 +6,7 @@ import BlogsController from '../controllers/BlogsController.js';
 const router = Router();
 
 router.post(
-  '/',
+  '/create',
   validate(blogsSchema.create),
   BlogsController.create,
 );
@@ -18,7 +18,7 @@ router.put(
 );
 
 router.delete(
-  '/:blogId',
+  '/delete/:blogId',
   BlogsController.delete,
 );
 
@@ -29,7 +29,7 @@ router.get(
 );
 
 router.get(
-  '/single/:id',
+  '/single/:blogId',
   validate(blogsSchema.show, 'query'),
   BlogsController.show,
 );

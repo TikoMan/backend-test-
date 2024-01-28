@@ -1,15 +1,19 @@
+import mongoose from 'mongoose';
 import HttpError from 'http-errors';
-import sequelize from '../services/sequelize.js';
-import { Blogs, Comments } from '../models/index.js';
+import Blogs from '../models/Blogs.js';
+import Comments from '../models/Comments.js';
 
 class CommentsController {
   static async create(req, res, next) {
-    const t = await sequelize.transaction();
     try {
       const { blogId, text } = req.body;
       const { userId } = req;
 
-      const blog = await Blogs.findByPk(blogId);
+      if (!mongoose.isValidObjectId(blogId)) {
+        throw HttpError(400, 'Invalid blogId format');
+      }
+
+      const blog = await Blogs.findById(blogId);
 
       if (!blog) {
         throw HttpError(404, 'blog is not found');
@@ -21,65 +25,66 @@ class CommentsController {
         text,
       });
 
-      await t.commit();
+      await Blogs.findByIdAndUpdate(blogId, { $push: { comments: comment.id } });
 
       res.send({
         status: 'ok',
         comment,
       });
     } catch (e) {
-      await t.rollback();
       next(e);
     }
   }
 
   static async update(req, res, next) {
-    const t = await sequelize.transaction();
     try {
       const { id, text } = req.body;
 
-      const comment = await Comments.findByPk(id);
+      if (!mongoose.isValidObjectId(id)) {
+        throw HttpError(400, 'Invalid blogId format');
+      }
+
+      const comment = await Comments.findByIdAndUpdate(
+        id,
+        {
+          text,
+        },
+        {
+          new: true,
+        },
+      );
 
       if (!comment) {
         throw HttpError(404, 'comment is not found');
       }
-
-      await comment.update({
-        text,
-      });
-
-      await t.commit();
 
       res.send({
         status: 'ok',
         comment,
       });
     } catch (e) {
-      await t.rollback();
       next(e);
     }
   }
 
   static async delete(req, res, next) {
-    const t = await sequelize.transaction();
     try {
       const { id } = req.params;
 
-      const comment = await Comments.findByPk(id);
+      if (!mongoose.isValidObjectId(id)) {
+        throw HttpError(400, 'Invalid blogId format');
+      }
+
+      const comment = await Comments.findByIdAndDelete(id);
 
       if (!comment) {
         throw HttpError(404, 'comment is not found');
       }
 
-      await comment.destroy();
-
-      await t.commit();
-
       res.send({
         status: 'ok',
       });
     } catch (e) {
-      await t.rollback();
       next(e);
     }
   }

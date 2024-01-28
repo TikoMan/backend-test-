@@ -1,23 +1,21 @@
 import HttpError from 'http-errors';
 import JWT from 'jsonwebtoken';
-import sequelize from '../services/sequelize.js';
-import { Users } from '../models/index.js';
+import mongoose from 'mongoose';
+import Users from '../models/Users.js';
+import passwordHashing from '../helper/passwordHashing.js';
 
 const { JWT_SECRET } = process.env;
 
 class UsersController {
   static async register(req, res, next) {
-    const t = await sequelize.transaction();
     try {
       const {
         firstName, lastName, email, password,
       } = req.body;
 
       const exists = await Users.findOne({
-        where: {
-          email,
-        },
-      });
+        email,
+      }).exec();
 
       if (exists) {
         throw HttpError(422, {
@@ -34,28 +32,22 @@ class UsersController {
         password,
       });
 
-      await t.commit();
-
       res.send({
         status: 'ok',
         user,
       });
     } catch (e) {
-      await t.rollback();
       next(e);
     }
   }
 
   static async login(req, res, next) {
-    const t = await sequelize.transaction();
     try {
       const { email, password } = req.body;
 
       const user = await Users.findOne({
-        where: {
-          email,
-          password: Users.passwordHash(password),
-        },
+        email,
+        password: passwordHashing(password),
       });
 
       if (!user) {
@@ -64,21 +56,17 @@ class UsersController {
 
       const token = JWT.sign({ userId: user.id }, JWT_SECRET);
 
-      await t.commit();
-
       res.send({
         status: 'ok',
         user,
         token,
       });
     } catch (e) {
-      await t.rollback();
       next(e);
     }
   }
 
   static async update(req, res, next) {
-    const t = await sequelize.transaction();
     try {
       const { userId } = req;
       const {
@@ -86,9 +74,7 @@ class UsersController {
       } = req.body;
 
       const exists = await Users.findOne({
-        where: {
-          email,
-        },
+        email,
       });
 
       if (exists && exists.id !== userId) {
@@ -99,50 +85,45 @@ class UsersController {
         });
       }
 
-      const user = await Users.findByPk(userId);
-
-      await user.update({
-        firstName,
-        lastName,
-        email,
-        password,
-      });
-
-      await t.commit();
+      const user = await Users.findOneAndUpdate(
+        { _id: userId },
+        {
+          firstName,
+          lastName,
+          email,
+          password,
+        },
+        {
+          new: true,
+        },
+      );
 
       res.send({
         status: 'ok',
         user,
       });
     } catch (e) {
-      await t.rollback();
       next(e);
     }
   }
 
   static async delete(req, res, next) {
-    const t = await sequelize.transaction();
     try {
       const { id } = req.params;
       const { userId } = req;
 
-      if (+id !== +userId) {
+      if (id !== userId) {
         throw HttpError(404, 'user not found');
       }
 
-      await Users.destroy({
-        where: {
-          id: userId,
-        },
+      await Users.deleteOne({
+        _id: id,
       });
-
-      await t.commit();
 
       res.send({
         status: 'ok',
       });
     } catch (e) {
-      await t.rollback();
       next(e);
     }
   }
@@ -151,7 +132,11 @@ class UsersController {
     try {
       const { id } = req.params;
 
-      const user = await Users.findByPk(id);
+      if (!mongoose.isValidObjectId(id)) {
+        throw HttpError(404, 'User not found');
+      }
+
+      const user = await Users.findById(id);
 
       if (!user) {
         throw HttpError(404, 'User not found');

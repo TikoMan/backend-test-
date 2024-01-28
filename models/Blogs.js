@@ -1,43 +1,37 @@
-import { DataTypes, Model } from 'sequelize';
-import sequelize from '../services/sequelize.js';
-import Users from './Users.js';
+import mongoose from '../services/mongoose.js';
+import Comments from './Comments.js';
 
-class Blogs extends Model {
-
-}
-
-Blogs.init({
-  id: {
-    type: DataTypes.BIGINT.UNSIGNED,
-    allowNull: false,
-    autoIncrement: true,
-    primaryKey: true,
+const blogsSchema = new mongoose.Schema({
+  title: { type: String, required: true },
+  body: { type: String, required: true },
+  author: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Users',
+    required: true,
   },
-  title: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  body: {
-    type: DataTypes.TEXT('long'),
-    allowNull: false,
-  },
+  comments: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Comments',
+    },
+  ],
 }, {
-  modelName: 'blogs',
-  tableName: 'blogs',
-  sequelize,
+  versionKey: false,
+  timestamps: true,
 });
 
-Blogs.belongsTo(Users, {
-  foreignKey: 'authorId',
-  as: 'author',
-  onUpdate: 'cascade',
-  onDelete: 'cascade',
+blogsSchema.pre('findOneAndDelete', async function delCascade(next) {
+  try {
+    const { _conditions: { _id: id } } = this;
+
+    await Comments.deleteMany({ blogId: id });
+
+    next();
+  } catch (error) {
+    next(error);
+  }
 });
 
-Users.hasMany(Blogs, {
-  foreignKey: 'authorId',
-  as: 'blogs',
-  onUpdate: 'cascade',
-  onDelete: 'cascade',
-});
+const Blogs = mongoose.model('Blogs', blogsSchema);
+
 export default Blogs;

@@ -7,7 +7,8 @@ export default {
   }),
 
   update: Joi.object({
-    blogId: Joi.number().min(1).required(),
+    blogId: Joi.string().trim().hex().length(24)
+      .required(),
     title: Joi.string().required(),
     body: Joi.string().required(),
   }),

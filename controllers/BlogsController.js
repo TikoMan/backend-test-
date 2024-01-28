@@ -1,92 +1,85 @@
 import HttpError from 'http-errors';
-import sequelize from '../services/sequelize.js';
-import { Blogs, Comments } from '../models/index.js';
+import mongoose from 'mongoose';
+import Blogs from '../models/Blogs.js';
+import Comments from '../models/Comments.js';
 
 class BlogsController {
   static async create(req, res, next) {
-    const t = await sequelize.transaction();
     try {
       const { userId } = req;
       const { title, body } = req.body;
 
       const blog = await Blogs.create({
-        authorId: userId,
+        author: userId,
         title,
         body,
       });
-
-      await t.commit();
 
       res.send({
         status: 'ok',
         blog,
       });
     } catch (e) {
-      await t.rollback();
       next(e);
     }
   }
 
   static async update(req, res, next) {
-    const t = await sequelize.transaction();
     try {
       const { userId } = req;
       const { blogId, title, body } = req.body;
 
-      const blog = await Blogs.findOne({
-        where: {
-          id: blogId,
-          authorId: userId,
-        },
+      if (!mongoose.isValidObjectId(blogId)) {
+        throw HttpError(400, 'Invalid blogId format');
+      }
+
+      const blog = await Blogs.findOneAndUpdate({
+        _id: blogId,
+        author: userId,
+      }, {
+        title,
+        body,
+      }, {
+        new: true,
       });
 
       if (!blog) {
         throw HttpError(404, 'blog not found');
       }
-
-      await blog.update({
-        title,
-        body,
-      });
-
-      await t.commit();
 
       res.send({
         status: 'ok',
         blog,
       });
     } catch (e) {
-      await t.rollback();
       next(e);
     }
   }
 
   static async delete(req, res, next) {
-    const t = await sequelize.transaction();
     try {
       const { userId } = req;
       const { blogId } = req.params;
 
-      const blog = await Blogs.findOne({
-        where: {
-          id: blogId,
-          authorId: userId,
+      if (!mongoose.isValidObjectId(blogId)) {
+        throw HttpError(400, 'Invalid blogId format');
+      }
+
+      const blog = await Blogs.findOneAndDelete(
+        {
+          _id: blogId,
+          author: userId,
         },
-      });
+      );
 
       if (!blog) {
         throw HttpError(404, 'blog not found');
       }
 
-      await blog.destroy();
-
-      await t.commit();
-
       res.send({
         status: 'ok',
       });
     } catch (e) {
-      await t.rollback();
       next(e);
     }
   }
@@ -95,12 +88,13 @@ class BlogsController {
     try {
       const { limit = 20, page = 1 } = req.query;
 
-      const blogs = await Blogs.findAll({
-        limit,
-        offset: (page - 1) * limit,
-      });
+      const blogs = await Blogs
+        .find()
+        .limit(limit)
+        .skip((page - 1) * limit)
+        .select('-comments');
 
-      const total = await Blogs.count();
+      const total = await Blogs.countDocuments();
       const totalPages = Math.ceil(total / limit);
 
       res.send({
@@ -116,27 +110,27 @@ class BlogsController {
 
   static async show(req, res, next) {
     try {
-      const { id } = req.params;
+      const { blogId } = req.params;
       const { limit = 20, page = 1 } = req.query;
 
-      const blog = await Blogs.findByPk(id, {
-        include: {
-          model: Comments,
-          as: 'comments',
-          limit,
-          offset: (page - 1) * limit,
-        },
-      });
+      if (!mongoose.isValidObjectId(blogId)) {
+        throw HttpError(400, 'Invalid blogId format');
+      }
+
+      const blog = await Blogs.findById(blogId)
+        .populate({
+          path: 'comments',
+          options: {
+            limit,
+            skip: (page - 1) * limit,
+          },
+        }).exec();
 
       if (!blog) {
         throw HttpError(404, 'blog not found');
       }
 
-      const totalComments = await Comments.count({
-        where: {
-          id,
-        },
-      });
+      const totalComments = await Comments.countDocuments({ blogId });
       const totalCommentsPages = Math.ceil(totalComments / limit);
 
       res.send({
