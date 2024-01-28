@@ -5,6 +5,7 @@ import HttpError from 'http-errors';
 import indexRouter from './routes/index.js';
 import cors from './middlewares/cors.js';
 import errorHandler from './middlewares/errorHandler.js';
+import authorization from './middlewares/authorization.js';
 
 const { NODE_HOST, NODE_PORT } = process.env;
 
@@ -15,6 +16,8 @@ app.use(cors);
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(express.static(path.resolve('public')));
+
+app.use(authorization);
 
 app.use(indexRouter);
 

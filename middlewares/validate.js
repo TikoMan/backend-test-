@@ -16,3 +16,5 @@ const validate = (schema, path = 'body') => async (req, res, next) => {
     next(HttpError(422, { errors }));
   }
 };
+
+export default validate;
